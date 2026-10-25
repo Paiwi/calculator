@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Калькулятор стоимости (стиль WoW)</title>
+  <style>
+    :root {
+      --bg-color: #2b2b2b;
+      --panel-bg: #353535;
+      --gold: #ffd700;
+      --white: #ffffff;
+      --accent: #ff4d4d;
+      --input-bg: #1a1a1a;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--white);
+      font-family: Segoe UI, Arial, sans-serif;
+      margin: 0;
+      padding: 16px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-weight: bold;
+      color: var(--gold);
+      margin-bottom: 24px;
+    }
+
+    .panel {
+      background: var(--panel-bg);
+      border: 1px solid #444;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .panel-title {
+      color: var(--gold);
+      font-size: 15px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+
+    .label {
+      min-width: 110px;
+      flex: 0 0 auto;
+      white-space: nowrap;
+    }
+
+    input[type="text"], input[type="number"] {
+      background: var(--input-bg);
+      color: white;
+      border: 1px solid #555;
+      padding: 6px 8px;
+      border-radius: 4px;
+      width: 90px;
+      font-size: 14px;
+    }
+
+    .total-row {
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      color: var(--gold);
+    }
+
+    /* Налоги и лицензия */
+    .checkbox-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .combo-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    select {
+      background: var(--input-bg);
+      color: white;
+      border: 1px solid #555;
+      padding: 6px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: var(--accent);
+      color: black;
+      font-weight: bold;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+    button:hover {
+      opacity: 0.9;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 16px;
+      background: #404040;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .amount {
+      font-size: 22px;
+      font-weight: bold;
+      color: var(--gold);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Калькулятор стоимости</h1>
+
+    <!-- 1 уровень -->
+    <div class="panel">
+      <div class="panel-title">1 уровень прибора</div>
+      <div class="row">
+        <span class="label">Цена за шт:</span>
+        <input type="number" id="p1" placeholder="0">
+      </div>
+      <div class="row">
+        <span class="label">Количество:</span>
+        <input type="number" id="q1" placeholder="0">
+      </div>
+      <div class="total-row">Итого: <span id="t1">0 ₽</span></div>
+    </div>
+
+    <!-- 2 уровень -->
+    <div class="panel">
+      <div class="panel-title">2 уровень прибора</div>
+      <div class="row">
+        <span class="label">Цена за шт:</span>
+        <input type="number" id="p2" placeholder="0">
+      </div>
+      <div class="row">
+        <span class="label">Количество:</span>
+        <input type="number" id="q2" placeholder="0">
+      </div>
+      <div class="total-row">Итого: <span id="t2">0 ₽</span></div>
+    </div>
+
+    <!-- Датчики -->
+    <div class="panel">
+      <div class="panel-title">Датчики</div>
+      <div class="row">
+        <span class="label">Цена за шт:</span>
+        <input type="number" id="ps" placeholder="0">
+      </div>
+      <div class="row">
+        <span class="label">Количество:</span>
+        <input type="number" id="qs" placeholder="0">
+      </div>
+      <div class="total-row">Итого: <span id="ts">0 ₽</span></div>
+    </div>
+
+    <!-- Кабель -->
+    <div class="panel">
+      <div class="panel-title">Кабель</div>
+      <div class="row">
+        <span class="label">Длина (м):</span>
+        <input type="number" id="cl" placeholder="0">
+      </div>
+      <div class="row">
+        <span class="label">Цена за метр (₽):</span>
+        <input type="number" id="cp" placeholder="0">
+      </div>
+      <div class="total-row">Итого: <span id="tc">0 ₽</span></div>
+    </div>
+
+    <!-- Налоги и лицензия -->
+    <div class="panel">
+      <div class="panel-title">Налоги и лицензия</div>
+      <div class="checkbox-group">
+        <label class="checkbox-item"><input type="checkbox" id="tax6"> Налог 6%</label>
+        <label class="checkbox-item"><input type="checkbox" id="lic20"> Лицензия 20%</label>
+      </div>
+      <div class="combo-row">
+        <span class="label">Пусконаладка (%):</span>
+        <select id="commission">
+          <option value="0">0%</option>
+          <option value="5">5%</option>
+          <option value="10">10%</option>
+          <option value="15">15%</option>
+          <option value="20">20%</option>
+          <option value="30">30%</option>
+        </select>
+      </div>
+      <label class="checkbox-item">
+        <input type="checkbox" id="cashout"> Обналичка (+20% к итогу)
+      </label>
+    </div>
+
+    <button onclick="calculate()">Рассчитать общую сумму</button>
+
+    <div class="result">
+      <div>Общая сумма:</div>
+      <div class="amount"><span id="total">0 ₽</span></div>
+    </div>
+  </div>
+
+  <script>
+    function calculate() {
+      const p1 = parseFloat(document.getElementById('p1').value) || 0;
+      const q1 = parseInt(document.getElementById('q1').value, 10) || 0;
+
+      const p2 = parseFloat(document.getElementById('p2').value) || 0;
+      const q2 = parseInt(document.getElementById('q2').value, 10) || 0;
+
+      const ps = parseFloat(document.getElementById('ps').value) || 0;
+      const qs = parseInt(document.getElementById('qs').value, 10) || 0;
+
+      const cl = parseFloat(document.getElementById('cl').value) || 0;
+      const cp = parseFloat(document.getElementById('cp').value) || 0;
+
+      // Промежуточные итоги
+      const t1 = p1 * q1;
+      const t2 = p2 * q2;
+      const ts = ps * qs;
+      const tc = cl * cp;
+
+      document.getElementById('t1').textContent = t1.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('t2').textContent = t2.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('ts').textContent = ts.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('tc').textContent = tc.toLocaleString('ru-RU') + ' ₽';
+
+      const baseTotal = t1 + t2 + ts + tc;
+
+      const tax6 = document.getElementById('tax6').checked;
+      const lic20 = document.getElementById('lic20').checked;
+
+      const commissionVal = parseFloat(document.getElementById('commission').value) || 0;
+      const commissionPercent = commissionVal / 100;
+
+      const cashout = document.getElementById('cashout').checked;
+
+      const tax = tax6 ? baseTotal * 0.06 : 0;
+      const license = lic20 ? baseTotal * 0.20 : 0;
+      const commission = baseTotal * commissionPercent;
+
+      const subtotal = baseTotal + tax + license + commission;
+      const extra = cashout ? subtotal * 0.20 : 0;
+
+      const finalTotal = subtotal + extra;
+
+      document.getElementById('total').textContent = finalTotal.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₽';
+    }
+  </script>
+</body>
+</html>
