@@ -12,6 +12,7 @@
       --white: #ffffff;
       --accent: #ff4d4d;
       --input-bg: #1a1a1a;
+      --border-color: #444;
     }
 
     body {
@@ -36,7 +37,7 @@
 
     .panel {
       background: var(--panel-bg);
-      border: 1px solid #444;
+      border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 16px;
       margin-bottom: 16px;
@@ -81,6 +82,50 @@
       justify-content: space-between;
       font-weight: bold;
       color: var(--gold);
+    }
+
+    /* Блок датчиков: кнопки и список */
+    .sensor-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .btn-add {
+      background: #555;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-add:hover {
+      background: #777;
+    }
+    .btn-clear {
+      background: #8b0000;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .btn-clear:hover {
+      background: #a00;
+    }
+
+    .sensor-list-area {
+      margin-top: 12px;
+      padding-top: 8px;
+      border-top: 1px solid #444;
+      font-size: 13px;
+      color: #aaa;
+    }
+    .sensor-values {
+      word-wrap: break-word;
+      margin-bottom: 6px;
     }
 
     /* Налоги и лицензия */
@@ -145,6 +190,29 @@
   <div class="container">
     <h1>Калькулятор стоимости</h1>
 
+    <!-- Новый блок: Подсчёт датчиков -->
+    <div class="panel">
+      <div class="panel-title">Подсчёт датчиков, кабеля, приборов</div>
+
+      <div class="row">
+        <span class="label">Количество датчиков:</span>
+        <input type="number" id="sensorInput" placeholder="0">
+        <div class="sensor-controls">
+          <button type="button" class="btn-add" onclick="addSensor()">+</button>
+          <button type="button" class="btn-clear" onclick="clearSensors()">Стереть всё</button>
+        </div>
+      </div>
+
+      <div class="total-row">
+        Итого датчиков: <span id="sensorTotalCount">0</span> шт
+      </div>
+
+      <div class="sensor-list-area">
+        <div>Введённые значения:</div>
+        <div class="sensor-values" id="sensorValuesList">-</div>
+      </div>
+    </div>
+
     <!-- 1 уровень -->
     <div class="panel">
       <div class="panel-title">1 уровень прибора</div>
@@ -171,20 +239,6 @@
         <input type="number" id="q2" placeholder="0">
       </div>
       <div class="total-row">Итого: <span id="t2">0 ₽</span></div>
-    </div>
-
-    <!-- Датчики -->
-    <div class="panel">
-      <div class="panel-title">Датчики</div>
-      <div class="row">
-        <span class="label">Цена за шт:</span>
-        <input type="number" id="ps" placeholder="0">
-      </div>
-      <div class="row">
-        <span class="label">Количество:</span>
-        <input type="number" id="qs" placeholder="0">
-      </div>
-      <div class="total-row">Итого: <span id="ts">0 ₽</span></div>
     </div>
 
     <!-- Кабель -->
@@ -262,6 +316,42 @@
   </div>
 
   <script>
+    // Переменные для блока датчиков
+    let sensorValues = [];
+    const sensorInput = document.getElementById('sensorInput');
+    const sensorTotalCountEl = document.getElementById('sensorTotalCount');
+    const sensorValuesListEl = document.getElementById('sensorValuesList');
+
+    function addSensor() {
+      const val = parseFloat(sensorInput.value);
+      if (isNaN(val) || val <= 0) {
+        alert('Введите положительное число');
+        return;
+      }
+      sensorValues.push(val);
+      updateSensorDisplay();
+      sensorInput.value = ''; // очищаем поле после добавления
+    }
+
+    function clearSensors() {
+      sensorValues = [];
+      updateSensorDisplay();
+    }
+
+    function updateSensorDisplay() {
+      // Сумма
+      const sum = sensorValues.reduce((acc, v) => acc + v, 0);
+      sensorTotalCountEl.textContent = sum.toLocaleString('ru-RU');
+
+      // Список через запятую
+      if (sensorValues.length === 0) {
+        sensorValuesListEl.textContent = '-';
+      } else {
+        // показываем как есть (целые или дробные)
+        sensorValuesListEl.textContent = sensorValues.map(v => v.toString()).join(', ');
+      }
+    }
+
     function calculate() {
       const p1 = parseFloat(document.getElementById('p1').value) || 0;
       const q1 = parseInt(document.getElementById('q1').value, 10) || 0;
@@ -269,21 +359,16 @@
       const p2 = parseFloat(document.getElementById('p2').value) || 0;
       const q2 = parseInt(document.getElementById('q2').value, 10) || 0;
 
-      const ps = parseFloat(document.getElementById('ps').value) || 0;
-      const qs = parseInt(document.getElementById('qs').value, 10) || 0;
-
       const cl = parseFloat(document.getElementById('cl').value) || 0;
       const cp = parseFloat(document.getElementById('cp').value) || 0;
 
       // Промежуточные итоги по основным позициям
       const t1 = p1 * q1;
       const t2 = p2 * q2;
-      const ts = ps * qs;
       const tc = cl * cp;
 
       document.getElementById('t1').textContent = t1.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('t2').textContent = t2.toLocaleString('ru-RU') + ' ₽';
-      document.getElementById('ts').textContent = ts.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('tc').textContent = tc.toLocaleString('ru-RU') + ' ₽';
 
       // Командировочные
@@ -300,7 +385,10 @@
       document.getElementById('rentTotal').textContent = rentTotal.toLocaleString('ru-RU') + ' ₽';
 
       // База для налогов/лицензии/пусконаладки — сумма основных позиций + командировочные + аренда
-      const baseTotal = t1 + t2 + ts + tc + travelTotal + rentTotal;
+      // Сюда добавляем сумму датчиков из нового блока
+      const sensorSum = sensorValues.reduce((acc, v) => acc + v, 0);
+
+      const baseTotal = t1 + t2 + tc + travelTotal + rentTotal + sensorSum;
 
       const tax6 = document.getElementById('tax6').checked;
       const lic20 = document.getElementById('lic20').checked;
