@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Калькулятор стоимости (стиль WoW)</title>
+  <title>Калькулятор стоимости (Стиль WoW + Смета)</title>
   <style>
     :root {
       --bg-color: #2b2b2b;
@@ -13,6 +13,7 @@
       --accent: #ff4d4d;
       --input-bg: #1a1a1a;
       --border-color: #444;
+      --text-muted: #aaa;
     }
 
     body {
@@ -24,7 +25,7 @@
     }
 
     .container {
-      max-width: 600px;
+      max-width: 700px;
       margin: 0 auto;
     }
 
@@ -61,7 +62,7 @@
     }
 
     .label {
-      min-width: 110px;
+      min-width: 130px;
       flex: 0 0 auto;
       white-space: nowrap;
     }
@@ -76,59 +77,61 @@
       font-size: 14px;
     }
 
-    .total-row {
-      margin-top: 8px;
-      display: flex;
-      justify-content: space-between;
-      font-weight: bold;
-      color: var(--gold);
+    select {
+      background: var(--input-bg);
+      color: white;
+      border: 1px solid #555;
+      padding: 6px;
+      border-radius: 4px;
+      font-size: 14px;
+      min-width: 100px;
     }
 
-    /* Кнопки и стили для блоков с накоплением */
-    .sensor-controls, .cable-controls {
+    /* Кнопки накопления */
+    .controls-group {
       display: flex;
       align-items: center;
       gap: 8px;
       margin-left: 8px;
     }
+    .btn-add, .btn-clear {
+      border: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 13px;
+    }
     .btn-add {
-      background: #555;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
+      background: #555; color: white;
     }
-    .btn-add:hover {
-      background: #777;
-    }
+    .btn-add:hover { background: #777; }
     .btn-clear {
-      background: #8b0000;
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
+      background: #8b0000; color: white;
     }
-    .btn-clear:hover {
-      background: #a00;
-    }
+    .btn-clear:hover { background: #a00; }
 
     .list-area {
       margin-top: 12px;
       padding-top: 8px;
       border-top: 1px solid #444;
       font-size: 13px;
-      color: #aaa;
+      color: var(--text-muted);
     }
     .values-list {
       word-wrap: break-word;
       margin-bottom: 6px;
     }
 
-    /* Налоги и лицензия */
+    .total-row {
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      color: var(--gold);
+    }
+
+    /* Чекбоксы и группы */
     .checkbox-group {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -141,22 +144,8 @@
       gap: 6px;
       cursor: pointer;
     }
-    .combo-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    select {
-      background: var(--input-bg);
-      color: white;
-      border: 1px solid #555;
-      padding: 6px;
-      border-radius: 4px;
-      font-size: 14px;
-    }
 
-    button {
+    button.main-btn {
       width: 100%;
       padding: 14px;
       background: var(--accent);
@@ -167,42 +156,83 @@
       border-radius: 6px;
       cursor: pointer;
       text-transform: uppercase;
+      margin-bottom: 10px;
     }
-    button:hover {
-      opacity: 0.9;
-    }
+    button.main-btn:hover { opacity: 0.9; }
 
     .result {
       margin-top: 20px;
       padding: 16px;
       background: #404040;
       border-radius: 8px;
-      text-align: center;
+      text-align: left;
     }
     .amount {
       font-size: 22px;
       font-weight: bold;
       color: var(--gold);
+      display: block;
+      margin-top: 5px;
+    }
+    
+    .copy-btn {
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 8px 16px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    .copy-btn:hover {
+      background: var(--gold);
+      color: #000;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Калькулятор стоимости</h1>
+    <h1>Калькулятор и Смета (WoW Style)</h1>
+
+    <!-- Настройки -->
+    <div class="panel">
+      <div class="panel-title">Настройки расчёта</div>
+      <div class="row">
+        <span class="label">Запас материалов (%)</span>
+        <input type="number" id="sparePercent" value="10" min="0" max="100" style="width:60px;">
+        <label style="font-size:12px; color:#aaa;">(применяется к датчикам и кабелю)</label>
+      </div>
+      <div class="row">
+        <span class="label">НДС</span>
+        <select id="vatOption">
+          <option value="0">Без НДС</option>
+		  <option value="5">С НДС 5%</option>
+          <option value="20" selected>С НДС 20%</option>
+        </select>
+      </div>
+      <div class="row">
+        <button type="button" class="main-btn" onclick="clearAllFields()">Очистить всё</button>
+      </div>
+    </div>
 
     <!-- Блок: Подсчёт датчиков -->
     <div class="panel">
       <div class="panel-title">Подсчёт датчиков</div>
       <div class="row">
-        <span class="label">Количество датчиков:</span>
+        <span class="label">Наименование</span>
+        <input type="text" id="sensorName" value="Датчики пожарные" placeholder="Например: ИП 212-141">
+      </div>
+      <div class="row">
+        <span class="label">Количество (шт):</span>
         <input type="number" id="sensorInput" placeholder="0">
-        <div class="sensor-controls">
+        <div class="controls-group">
           <button type="button" class="btn-add" onclick="addSensor()">+</button>
-          <button type="button" class="btn-clear" onclick="clearSensors()">Стереть всё</button>
+          <button type="button" class="btn-clear" onclick="clearSensors()">Стереть</button>
         </div>
       </div>
       <div class="total-row">
-        Итого датчиков: <span id="sensorTotalCount">0</span> шт
+        Итого (с запасом): <span id="sensorTotalCount">0</span> шт
       </div>
       <div class="list-area">
         <div>Введённые значения:</div>
@@ -214,15 +244,19 @@
     <div class="panel">
       <div class="panel-title">Подсчёт кабеля</div>
       <div class="row">
-        <span class="label">Длина кабеля (м):</span>
+        <span class="label">Наименование</span>
+        <input type="text" id="cableName" value="Кабель ВВГнг-LS" placeholder="Марка кабеля">
+      </div>
+      <div class="row">
+        <span class="label">Длина (м):</span>
         <input type="number" id="cableInput" placeholder="0">
-        <div class="cable-controls">
+        <div class="controls-group">
           <button type="button" class="btn-add" onclick="addCable()">+</button>
-          <button type="button" class="btn-clear" onclick="clearCable()">Стереть всё</button>
+          <button type="button" class="btn-clear" onclick="clearCable()">Стереть</button>
         </div>
       </div>
       <div class="total-row">
-        Итого кабеля: <span id="cableTotalLength">0</span> м
+        Итого (с запасом): <span id="cableTotalLength">0</span> м
       </div>
       <div class="list-area">
         <div>Введённые значения:</div>
@@ -234,7 +268,7 @@
     <div class="panel">
       <div class="panel-title">1 уровень прибора</div>
       <div class="row">
-        <span class="label">Цена за шт:</span>
+        <span class="label">Цена за шт (₽):</span>
         <input type="number" id="p1" placeholder="0">
       </div>
       <div class="row">
@@ -248,7 +282,7 @@
     <div class="panel">
       <div class="panel-title">2 уровень прибора</div>
       <div class="row">
-        <span class="label">Цена за шт:</span>
+        <span class="label">Цена за шт (₽):</span>
         <input type="number" id="p2" placeholder="0">
       </div>
       <div class="row">
@@ -258,9 +292,9 @@
       <div class="total-row">Итого: <span id="t2">0 ₽</span></div>
     </div>
 
-    <!-- Кабель: цена за метр (резерв) -->
+    <!-- Кабель: цена за метр (резерв для точного расчёта) -->
     <div class="panel">
-      <div class="panel-title">Кабель: цена за метр</div>
+      <div class="panel-title">Кабель: расчёт по цене</div>
       <div class="row">
         <span class="label">Длина (м) — резерв:</span>
         <input type="number" id="cl" placeholder="0">
@@ -279,16 +313,12 @@
         <label class="checkbox-item"><input type="checkbox" id="tax6"> Налог 6%</label>
         <label class="checkbox-item"><input type="checkbox" id="lic20"> Лицензия 20%</label>
       </div>
-      <div class="combo-row">
-        <span class="label">Пусконаладка (%):</span>
-        <select id="commission">
-          <option value="0">0%</option>
-          <option value="5">5%</option>
-          <option value="10">10%</option>
-          <option value="15">15%</option>
-          <option value="20">20%</option>
-          <option value="30">30%</option>
-        </select>
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+         <span style="min-width:140px;">Пусконаладка (%):</span>
+         <select id="commission" style="min-width:auto;">
+           <option value="0">0%</option><option value="5">5%</option><option value="10">10%</option>
+           <option value="15">15%</option><option value="20">20%</option><option value="30">30%</option>
+         </select>
       </div>
       <label class="checkbox-item">
         <input type="checkbox" id="cashout"> Обналичка (+20% к итогу)
@@ -296,7 +326,7 @@
 
       <!-- Командировочные -->
       <div class="row" style="margin-top:12px;">
-        <span class="label" style="min-width:140px;">Командировочные (₽/чел/день):</span>
+        <span class="label" style="min-width:160px;">Командировочные (₽/чел/день):</span>
         <input type="number" id="travelRate" placeholder="0">
       </div>
       <div class="row">
@@ -321,16 +351,20 @@
       <div class="total-row">Итого аренда: <span id="rentTotal">0 ₽</span></div>
     </div>
 
-    <button onclick="calculate()">Рассчитать общую сумму</button>
+    <button type="button" class="main-btn" onclick="calculate()">Рассчитать общую сумму</button>
 
     <div class="result">
-      <div>Общая сумма:</div>
-      <div class="amount"><span id="total">0 ₽</span></div>
+      <div>Общая сумма (база): <span id="baseTotal" class="amount">0 ₽</span></div>
+      <div>Итого с налогами и надбавками: <span id="finalTotal" class="amount">0 ₽</span></div>
+      <div id="vatInfo" style="font-size:13px; color:var(--text-muted); margin-top:5px;"></div>
+      
+      <button type="button" class="copy-btn" onclick="copyEstimate()">Копировать смету для КП</button>
+      <div id="clipboardMsg" style="color:var(--gold); font-weight:bold; display:none; margin-top:5px;">Скопировано!</div>
     </div>
   </div>
 
   <script>
-    // --- Датчики ---
+    // --- Переменные для датчиков ---
     let sensorValues = [];
     const sensorInput = document.getElementById('sensorInput');
     const sensorTotalCountEl = document.getElementById('sensorTotalCount');
@@ -354,7 +388,13 @@
 
     function updateSensorDisplay() {
       const sum = sensorValues.reduce((acc, v) => acc + v, 0);
-      sensorTotalCountEl.textContent = sum.toLocaleString('ru-RU');
+      // Отображаем с запасом только в итоговом поле, но список исходных значений сохраняем
+      const sparePercent = parseFloat(document.getElementById('sparePercent').value) || 0;
+      const factor = 1 + sparePercent / 100;
+      const withSpare = sum * factor;
+      
+      sensorTotalCountEl.textContent = Math.ceil(withSpare).toLocaleString('ru-RU');
+      
       if (sensorValues.length === 0) {
         sensorValuesListEl.textContent = '-';
       } else {
@@ -362,7 +402,7 @@
       }
     }
 
-    // --- Кабель (накопление метров) ---
+    // --- Переменные для кабеля ---
     let cableValues = [];
     const cableInput = document.getElementById('cableInput');
     const cableTotalLengthEl = document.getElementById('cableTotalLength');
@@ -386,7 +426,12 @@
 
     function updateCableDisplay() {
       const sum = cableValues.reduce((acc, v) => acc + v, 0);
-      cableTotalLengthEl.textContent = sum.toLocaleString('ru-RU');
+      const sparePercent = parseFloat(document.getElementById('sparePercent').value) || 0;
+      const factor = 1 + sparePercent / 100;
+      const withSpare = sum * factor;
+
+      cableTotalLengthEl.textContent = Math.ceil(withSpare).toLocaleString('ru-RU');
+
       if (cableValues.length === 0) {
         cableValuesListEl.textContent = '-';
       } else {
@@ -396,42 +441,46 @@
 
     // --- Общий расчёт ---
     function calculate() {
+      const sparePercent = parseFloat(document.getElementById('sparePercent').value) || 0;
+      const spareFactor = 1 + sparePercent / 100;
+
       const p1 = parseFloat(document.getElementById('p1').value) || 0;
-      const q1 = parseInt(document.getElementById('q1').value, 10) || 0;
+      const q1 = parseFloat(document.getElementById('q1').value) || 0;
 
       const p2 = parseFloat(document.getElementById('p2').value) || 0;
-      const q2 = parseInt(document.getElementById('q2').value, 10) || 0;
+      const q2 = parseFloat(document.getElementById('q2').value) || 0;
 
-      // Старая строка с кабелем (цена за метр) — берём только если есть цена и длина
       const cl = parseFloat(document.getElementById('cl').value) || 0;
       const cp = parseFloat(document.getElementById('cp').value) || 0;
-      const tc = cl * cp;
-      document.getElementById('tc').textContent = tc.toLocaleString('ru-RU') + ' ₽';
 
+      // Промежуточные итоги
       const t1 = p1 * q1;
       const t2 = p2 * q2;
+      const tc = cl * cp;
+
+      // Датчики и кабель с запасом
+      const sensorSumWithSpare = sensorValues.reduce((acc, v) => acc + v, 0) * spareFactor;
+      const cableSumWithSpare = cableValues.reduce((acc, v) => acc + v, 0) * spareFactor;
 
       document.getElementById('t1').textContent = t1.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('t2').textContent = t2.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('tc').textContent = tc.toLocaleString('ru-RU') + ' ₽';
 
       // Командировочные
       const travelRate = parseFloat(document.getElementById('travelRate').value) || 0;
-      const travelPeople = parseInt(document.getElementById('travelPeople').value, 10) || 0;
-      const travelDays = parseInt(document.getElementById('travelDays').value, 10) || 0;
+      const travelPeople = parseFloat(document.getElementById('travelPeople').value) || 0;
+      const travelDays = parseFloat(document.getElementById('travelDays').value) || 0;
       const travelTotal = travelRate * travelPeople * travelDays;
       document.getElementById('travelTotal').textContent = travelTotal.toLocaleString('ru-RU') + ' ₽';
 
       // Аренда квартиры
       const rentRate = parseFloat(document.getElementById('rentRate').value) || 0;
-      const rentDays = parseInt(document.getElementById('rentDays').value, 10) || 0;
+      const rentDays = parseFloat(document.getElementById('rentDays').value) || 0;
       const rentTotal = rentRate * rentDays;
       document.getElementById('rentTotal').textContent = rentTotal.toLocaleString('ru-RU') + ' ₽';
 
-      // База для налогов/лицензии/пусконаладки — сумма основных позиций + командировочные + аренда
-      // Сюда добавляем сумму датчиков из нового блока
-      const sensorSum = sensorValues.reduce((acc, v) => acc + v, 0);
-
-      const baseTotal = t1 + t2 + tc + travelTotal + rentTotal + sensorSum;
+      // База
+      const baseTotal = t1 + t2 + tc + travelTotal + rentTotal + sensorSumWithSpare + cableSumWithSpare;
 
       const tax6 = document.getElementById('tax6').checked;
       const lic20 = document.getElementById('lic20').checked;
@@ -448,10 +497,177 @@
       const subtotal = baseTotal + tax + license + commission;
       const extra = cashout ? subtotal * 0.20 : 0;
 
-      const finalTotal = subtotal + extra;
+      let finalTotal = subtotal + extra;
 
-      document.getElementById('total').textContent = finalTotal.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₽';
+      // НДС
+      const vatOption = parseFloat(document.getElementById('vatOption').value) || 0;
+      const vatAmount = finalTotal * (vatOption / 100);
+      const totalWithVat = finalTotal + vatAmount;
+
+      document.getElementById('baseTotal').textContent =
+        baseTotal.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₽';
+
+      document.getElementById('finalTotal').textContent =
+        totalWithVat.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₽';
+
+      const vatInfo = document.getElementById('vatInfo');
+      if (vatOption > 0) {
+        vatInfo.textContent = 'В том числе НДС ' + vatOption + '%: ' +
+          vatAmount.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₽';
+      } else {
+        vatInfo.textContent = 'НДС не учтён';
+      }
+
+      // Сохраняем данные для копирования сметы
+      window.lastEstimateData = {
+        sensorValues: [...sensorValues],
+        cableValues: [...cableValues],
+        sensorName: document.getElementById('sensorName').value || 'Датчики',
+        cableName: document.getElementById('cableName').value || 'Кабель',
+        sparePercent: sparePercent,
+        sensorSumWithSpare: sensorSumWithSpare,
+        cableSumWithSpare: cableSumWithSpare,
+        t1: t1, t2: t2, tc: tc,
+        travelTotal: travelTotal, rentTotal: rentTotal,
+        tax: tax, license: license, commission: commission,
+        cashoutExtra: extra,
+        vatAmount: vatAmount, vatOption: vatOption,
+        baseTotal: baseTotal,
+        finalTotal: totalWithVat,
+        date: new Date().toLocaleDateString('ru-RU')
+      };
     }
+
+    // --- Копирование сметы для КП ---
+    function copyEstimate() {
+      if (!window.lastEstimateData) {
+        alert('Сначала нажмите «Рассчитать общую сумму»');
+        return;
+      }
+
+      const d = window.lastEstimateData;
+      const rub = (num) => num.toLocaleString('ru-RU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' ₽';
+
+      const lines = [];
+      lines.push('СМЕТА РАСЧЁТ СТОИМОСТИ');
+      lines.push('Дата: ' + d.date);
+      lines.push('─'.repeat(40));
+      lines.push('');
+
+      if (d.sensorValues.length > 0) {
+        lines.push('1. ' + d.sensorName + ': ' + d.sensorValues.join(', '));
+        lines.push('   Итого (с запасом ' + d.sparePercent + '%): ' + Math.ceil(d.sensorSumWithSpare) + ' шт');
+      }
+      if (d.cableValues.length > 0) {
+        lines.push('2. ' + d.cableName + ': ' + d.cableValues.join(', '));
+        lines.push('   Итого (с запасом ' + d.sparePercent + '%): ' + Math.ceil(d.cableSumWithSpare) + ' м');
+      }
+      if (d.t1 > 0) {
+        lines.push('3. Приборы 1 уровня: ' + rub(d.t1));
+      }
+      if (d.t2 > 0) {
+        lines.push('4. Приборы 2 уровня: ' + rub(d.t2));
+      }
+      if (d.tc > 0) {
+        lines.push('5. Кабель (по цене за метр): ' + rub(d.tc));
+      }
+      if (d.travelTotal > 0) {
+        lines.push('6. Командировочные: ' + rub(d.travelTotal));
+      }
+      if (d.rentTotal > 0) {
+        lines.push('7. Аренда квартиры: ' + rub(d.rentTotal));
+      }
+
+      lines.push('─'.repeat(40));
+      lines.push('База: ' + rub(d.baseTotal));
+      if (d.tax > 0)    lines.push('+ Налог 6%: ' + rub(d.tax));
+      if (d.license > 0) lines.push('+ Лицензия 20%: ' + rub(d.license));
+      if (d.commission > 0) lines.push('+ Пусконаладка: ' + rub(d.commission));
+      if (d.cashoutExtra > 0) lines.push('+ Обналичка 20%: ' + rub(d.cashoutExtra));
+      if (d.vatAmount > 0) lines.push('+ НДС ' + d.vatOption + '%: ' + rub(d.vatAmount));
+      lines.push('');
+      lines.push('ИТОГО: ' + rub(d.finalTotal));
+
+      const text = lines.join('\n');
+
+      // Копирование в буфер обмена с фолбэком
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showCopyMessage();
+        }).catch(() => {
+          fallbackCopy(text);
+        });
+      } else {
+        fallbackCopy(text);
+      }
+    }
+
+    function fallbackCopy(text) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showCopyMessage();
+      } catch (e) {
+        alert('Не удалось скопировать автоматически. Выделите текст вручную:\n\n' + text);
+      }
+      document.body.removeChild(ta);
+    }
+
+    function showCopyMessage() {
+      const msg = document.getElementById('clipboardMsg');
+      msg.style.display = 'block';
+      setTimeout(() => { msg.style.display = 'none'; }, 2500);
+    }
+
+    // --- Очистка всех полей ---
+    function clearAllFields() {
+      if (!confirm('Очистить все поля калькулятора?')) return;
+
+      // Очищаем все input
+      document.querySelectorAll('input[type="number"], input[type="text"]').forEach(el => {
+        if (el.id === 'sparePercent') {
+          el.value = '10'; // возвращаем значение по умолчанию
+        } else {
+          el.value = '';
+        }
+      });
+
+      // Сбрасываем select
+      document.getElementById('commission').value = '0';
+      document.getElementById('vatOption').value = '0';
+
+      // Снимаем чекбоксы
+      ['tax6', 'lic20', 'cashout'].forEach(id => {
+        document.getElementById(id).checked = false;
+      });
+
+      // Очищаем накопители
+      sensorValues = [];
+      cableValues = [];
+      updateSensorDisplay();
+      updateCableDisplay();
+
+      // Сбрасываем итоги
+      ['t1', 't2', 'tc', 'travelTotal', 'rentTotal', 'total'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '0 ₽';
+      });
+      document.getElementById('baseTotal').textContent = '0 ₽';
+      document.getElementById('finalTotal').textContent = '0 ₽';
+      document.getElementById('vatInfo').textContent = '';
+      window.lastEstimateData = null;
+    }
+
+    // Обновляем отображение запаса при изменении процента
+    document.getElementById('sparePercent').addEventListener('input', () => {
+      updateSensorDisplay();
+      updateCableDisplay();
+    });
   </script>
 </body>
 </html>
