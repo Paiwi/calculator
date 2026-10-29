@@ -201,13 +201,15 @@
       <div class="total-row">Итого: <span id="tc">0 ₽</span></div>
     </div>
 
-    <!-- Налоги и лицензия -->
+    <!-- Налоги и лицензия + доп расходы -->
     <div class="panel">
-      <div class="panel-title">Налоги и лицензия</div>
+      <div class="panel-title">Налоги, лицензия и доп. расходы</div>
+
       <div class="checkbox-group">
         <label class="checkbox-item"><input type="checkbox" id="tax6"> Налог 6%</label>
         <label class="checkbox-item"><input type="checkbox" id="lic20"> Лицензия 20%</label>
       </div>
+
       <div class="combo-row">
         <span class="label">Пусконаладка (%):</span>
         <select id="commission">
@@ -219,9 +221,36 @@
           <option value="30">30%</option>
         </select>
       </div>
+
       <label class="checkbox-item">
         <input type="checkbox" id="cashout"> Обналичка (+20% к итогу)
       </label>
+
+      <!-- Командировочные -->
+      <div class="row" style="margin-top:12px;">
+        <span class="label" style="min-width:140px;">Командировочные (₽/чел/день):</span>
+        <input type="number" id="travelRate" placeholder="0">
+      </div>
+      <div class="row">
+        <span class="label">Кол-во человек:</span>
+        <input type="number" id="travelPeople" placeholder="0">
+      </div>
+      <div class="row">
+        <span class="label">Кол-во дней:</span>
+        <input type="number" id="travelDays" placeholder="0">
+      </div>
+      <div class="total-row">Итого командировочные: <span id="travelTotal">0 ₽</span></div>
+
+      <!-- Аренда квартиры -->
+      <div class="row" style="margin-top:12px;">
+        <span class="label">Аренда квартиры (₽/сутки):</span>
+        <input type="number" id="rentRate" placeholder="0">
+      </div>
+      <div class="row">
+        <span class="label">Кол-во суток:</span>
+        <input type="number" id="rentDays" placeholder="0">
+      </div>
+      <div class="total-row">Итого аренда: <span id="rentTotal">0 ₽</span></div>
     </div>
 
     <button onclick="calculate()">Рассчитать общую сумму</button>
@@ -246,7 +275,7 @@
       const cl = parseFloat(document.getElementById('cl').value) || 0;
       const cp = parseFloat(document.getElementById('cp').value) || 0;
 
-      // Промежуточные итоги
+      // Промежуточные итоги по основным позициям
       const t1 = p1 * q1;
       const t2 = p2 * q2;
       const ts = ps * qs;
@@ -257,7 +286,21 @@
       document.getElementById('ts').textContent = ts.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('tc').textContent = tc.toLocaleString('ru-RU') + ' ₽';
 
-      const baseTotal = t1 + t2 + ts + tc;
+      // Командировочные
+      const travelRate = parseFloat(document.getElementById('travelRate').value) || 0;
+      const travelPeople = parseInt(document.getElementById('travelPeople').value, 10) || 0;
+      const travelDays = parseInt(document.getElementById('travelDays').value, 10) || 0;
+      const travelTotal = travelRate * travelPeople * travelDays;
+      document.getElementById('travelTotal').textContent = travelTotal.toLocaleString('ru-RU') + ' ₽';
+
+      // Аренда квартиры
+      const rentRate = parseFloat(document.getElementById('rentRate').value) || 0;
+      const rentDays = parseInt(document.getElementById('rentDays').value, 10) || 0;
+      const rentTotal = rentRate * rentDays;
+      document.getElementById('rentTotal').textContent = rentTotal.toLocaleString('ru-RU') + ' ₽';
+
+      // База для налогов/лицензии/пусконаладки — сумма основных позиций + командировочные + аренда
+      const baseTotal = t1 + t2 + ts + tc + travelTotal + rentTotal;
 
       const tax6 = document.getElementById('tax6').checked;
       const lic20 = document.getElementById('lic20').checked;
