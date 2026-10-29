@@ -84,12 +84,12 @@
       color: var(--gold);
     }
 
-    /* Блок датчиков: кнопки и список */
-    .sensor-controls {
+    /* Кнопки и стили для блоков с накоплением */
+    .sensor-controls, .cable-controls {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 12px;
+      margin-left: 8px;
     }
     .btn-add {
       background: #555;
@@ -116,14 +116,14 @@
       background: #a00;
     }
 
-    .sensor-list-area {
+    .list-area {
       margin-top: 12px;
       padding-top: 8px;
       border-top: 1px solid #444;
       font-size: 13px;
       color: #aaa;
     }
-    .sensor-values {
+    .values-list {
       word-wrap: break-word;
       margin-bottom: 6px;
     }
@@ -190,10 +190,9 @@
   <div class="container">
     <h1>Калькулятор стоимости</h1>
 
-    <!-- Новый блок: Подсчёт датчиков -->
+    <!-- Блок: Подсчёт датчиков -->
     <div class="panel">
-      <div class="panel-title">Подсчёт датчиков, кабеля, приборов</div>
-
+      <div class="panel-title">Подсчёт датчиков</div>
       <div class="row">
         <span class="label">Количество датчиков:</span>
         <input type="number" id="sensorInput" placeholder="0">
@@ -202,14 +201,32 @@
           <button type="button" class="btn-clear" onclick="clearSensors()">Стереть всё</button>
         </div>
       </div>
-
       <div class="total-row">
         Итого датчиков: <span id="sensorTotalCount">0</span> шт
       </div>
-
-      <div class="sensor-list-area">
+      <div class="list-area">
         <div>Введённые значения:</div>
-        <div class="sensor-values" id="sensorValuesList">-</div>
+        <div class="values-list" id="sensorValuesList">-</div>
+      </div>
+    </div>
+
+    <!-- Блок: Подсчёт кабеля -->
+    <div class="panel">
+      <div class="panel-title">Подсчёт кабеля</div>
+      <div class="row">
+        <span class="label">Длина кабеля (м):</span>
+        <input type="number" id="cableInput" placeholder="0">
+        <div class="cable-controls">
+          <button type="button" class="btn-add" onclick="addCable()">+</button>
+          <button type="button" class="btn-clear" onclick="clearCable()">Стереть всё</button>
+        </div>
+      </div>
+      <div class="total-row">
+        Итого кабеля: <span id="cableTotalLength">0</span> м
+      </div>
+      <div class="list-area">
+        <div>Введённые значения:</div>
+        <div class="values-list" id="cableValuesList">-</div>
       </div>
     </div>
 
@@ -241,11 +258,11 @@
       <div class="total-row">Итого: <span id="t2">0 ₽</span></div>
     </div>
 
-    <!-- Кабель -->
+    <!-- Кабель: цена за метр (резерв) -->
     <div class="panel">
-      <div class="panel-title">Кабель</div>
+      <div class="panel-title">Кабель: цена за метр</div>
       <div class="row">
-        <span class="label">Длина (м):</span>
+        <span class="label">Длина (м) — резерв:</span>
         <input type="number" id="cl" placeholder="0">
       </div>
       <div class="row">
@@ -258,12 +275,10 @@
     <!-- Налоги и лицензия + доп расходы -->
     <div class="panel">
       <div class="panel-title">Налоги, лицензия и доп. расходы</div>
-
       <div class="checkbox-group">
         <label class="checkbox-item"><input type="checkbox" id="tax6"> Налог 6%</label>
         <label class="checkbox-item"><input type="checkbox" id="lic20"> Лицензия 20%</label>
       </div>
-
       <div class="combo-row">
         <span class="label">Пусконаладка (%):</span>
         <select id="commission">
@@ -275,7 +290,6 @@
           <option value="30">30%</option>
         </select>
       </div>
-
       <label class="checkbox-item">
         <input type="checkbox" id="cashout"> Обналичка (+20% к итогу)
       </label>
@@ -316,7 +330,7 @@
   </div>
 
   <script>
-    // Переменные для блока датчиков
+    // --- Датчики ---
     let sensorValues = [];
     const sensorInput = document.getElementById('sensorInput');
     const sensorTotalCountEl = document.getElementById('sensorTotalCount');
@@ -330,7 +344,7 @@
       }
       sensorValues.push(val);
       updateSensorDisplay();
-      sensorInput.value = ''; // очищаем поле после добавления
+      sensorInput.value = '';
     }
 
     function clearSensors() {
@@ -339,19 +353,48 @@
     }
 
     function updateSensorDisplay() {
-      // Сумма
       const sum = sensorValues.reduce((acc, v) => acc + v, 0);
       sensorTotalCountEl.textContent = sum.toLocaleString('ru-RU');
-
-      // Список через запятую
       if (sensorValues.length === 0) {
         sensorValuesListEl.textContent = '-';
       } else {
-        // показываем как есть (целые или дробные)
         sensorValuesListEl.textContent = sensorValues.map(v => v.toString()).join(', ');
       }
     }
 
+    // --- Кабель (накопление метров) ---
+    let cableValues = [];
+    const cableInput = document.getElementById('cableInput');
+    const cableTotalLengthEl = document.getElementById('cableTotalLength');
+    const cableValuesListEl = document.getElementById('cableValuesList');
+
+    function addCable() {
+      const val = parseFloat(cableInput.value);
+      if (isNaN(val) || val <= 0) {
+        alert('Введите положительное число');
+        return;
+      }
+      cableValues.push(val);
+      updateCableDisplay();
+      cableInput.value = '';
+    }
+
+    function clearCable() {
+      cableValues = [];
+      updateCableDisplay();
+    }
+
+    function updateCableDisplay() {
+      const sum = cableValues.reduce((acc, v) => acc + v, 0);
+      cableTotalLengthEl.textContent = sum.toLocaleString('ru-RU');
+      if (cableValues.length === 0) {
+        cableValuesListEl.textContent = '-';
+      } else {
+        cableValuesListEl.textContent = cableValues.map(v => v.toString()).join(', ');
+      }
+    }
+
+    // --- Общий расчёт ---
     function calculate() {
       const p1 = parseFloat(document.getElementById('p1').value) || 0;
       const q1 = parseInt(document.getElementById('q1').value, 10) || 0;
@@ -359,17 +402,17 @@
       const p2 = parseFloat(document.getElementById('p2').value) || 0;
       const q2 = parseInt(document.getElementById('q2').value, 10) || 0;
 
+      // Старая строка с кабелем (цена за метр) — берём только если есть цена и длина
       const cl = parseFloat(document.getElementById('cl').value) || 0;
       const cp = parseFloat(document.getElementById('cp').value) || 0;
+      const tc = cl * cp;
+      document.getElementById('tc').textContent = tc.toLocaleString('ru-RU') + ' ₽';
 
-      // Промежуточные итоги по основным позициям
       const t1 = p1 * q1;
       const t2 = p2 * q2;
-      const tc = cl * cp;
 
       document.getElementById('t1').textContent = t1.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('t2').textContent = t2.toLocaleString('ru-RU') + ' ₽';
-      document.getElementById('tc').textContent = tc.toLocaleString('ru-RU') + ' ₽';
 
       // Командировочные
       const travelRate = parseFloat(document.getElementById('travelRate').value) || 0;
