@@ -15,7 +15,6 @@
       --border-color: #444;
       --text-muted: #aaa;
     }
-
     body {
       background-color: var(--bg-color);
       color: var(--white);
@@ -23,19 +22,13 @@
       margin: 0;
       padding: 16px;
     }
-
-    .container {
-      max-width: 700px;
-      margin: 0 auto;
-    }
-
+    .container { max-width: 700px; margin: 0 auto; }
     h1 {
       text-align: center;
       font-weight: bold;
       color: var(--gold);
       margin-bottom: 24px;
     }
-
     .panel {
       background: var(--panel-bg);
       border: 1px solid var(--border-color);
@@ -43,7 +36,6 @@
       padding: 16px;
       margin-bottom: 16px;
     }
-
     .panel-title {
       color: var(--gold);
       font-size: 15px;
@@ -52,7 +44,6 @@
       text-transform: uppercase;
       letter-spacing: 1px;
     }
-
     .row {
       display: flex;
       align-items: center;
@@ -60,13 +51,7 @@
       margin-bottom: 8px;
       flex-wrap: wrap;
     }
-
-    .label {
-      min-width: 130px;
-      flex: 0 0 auto;
-      white-space: nowrap;
-    }
-
+    .label { min-width: 130px; flex: 0 0 auto; white-space: nowrap; }
     input[type="text"], input[type="number"] {
       background: var(--input-bg);
       color: white;
@@ -76,7 +61,6 @@
       width: 90px;
       font-size: 14px;
     }
-
     select {
       background: var(--input-bg);
       color: white;
@@ -86,14 +70,7 @@
       font-size: 14px;
       min-width: 100px;
     }
-
-    /* Кнопки накопления */
-    .controls-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-left: 8px;
-    }
+    .controls-group { display: flex; align-items: center; gap: 8px; margin-left: 8px; }
     .btn-add, .btn-clear {
       border: none;
       padding: 6px 12px;
@@ -102,15 +79,10 @@
       font-weight: bold;
       font-size: 13px;
     }
-    .btn-add {
-      background: #555; color: white;
-    }
+    .btn-add { background: #555; color: white; }
     .btn-add:hover { background: #777; }
-    .btn-clear {
-      background: #8b0000; color: white;
-    }
+    .btn-clear { background: #8b0000; color: white; }
     .btn-clear:hover { background: #a00; }
-
     .list-area {
       margin-top: 12px;
       padding-top: 8px;
@@ -118,11 +90,7 @@
       font-size: 13px;
       color: var(--text-muted);
     }
-    .values-list {
-      word-wrap: break-word;
-      margin-bottom: 6px;
-    }
-
+    .values-list { word-wrap: break-word; margin-bottom: 6px; }
     .total-row {
       margin-top: 12px;
       display: flex;
@@ -130,21 +98,13 @@
       font-weight: bold;
       color: var(--gold);
     }
-
-    /* Чекбоксы и группы */
     .checkbox-group {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 6px;
       margin-bottom: 12px;
     }
-    .checkbox-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-    }
-
+    .checkbox-item { display: flex; align-items: center; gap: 6px; cursor: pointer; }
     button.main-btn {
       width: 100%;
       padding: 14px;
@@ -159,7 +119,6 @@
       margin-bottom: 10px;
     }
     button.main-btn:hover { opacity: 0.9; }
-
     .result {
       margin-top: 20px;
       padding: 16px;
@@ -174,7 +133,6 @@
       display: block;
       margin-top: 5px;
     }
-    
     .copy-btn {
       background: transparent;
       border: 1px solid var(--gold);
@@ -185,10 +143,7 @@
       font-size: 14px;
       margin-top: 10px;
     }
-    .copy-btn:hover {
-      background: var(--gold);
-      color: #000;
-    }
+    .copy-btn:hover { background: var(--gold); color: #000; }
   </style>
 </head>
 <body>
@@ -207,7 +162,7 @@
         <span class="label">НДС</span>
         <select id="vatOption">
           <option value="0">Без НДС</option>
-		  <option value="5">С НДС 5%</option>
+          <option value="5">С НДС 5%</option>
           <option value="20" selected>С НДС 20%</option>
         </select>
       </div>
@@ -292,7 +247,7 @@
       <div class="total-row">Итого: <span id="t2">0 ₽</span></div>
     </div>
 
-    <!-- Кабель: цена за метр (резерв для точного расчёта) -->
+    <!-- Кабель: цена за метр -->
     <div class="panel">
       <div class="panel-title">Кабель: расчёт по цене</div>
       <div class="row">
@@ -304,6 +259,20 @@
         <input type="number" id="cp" placeholder="0">
       </div>
       <div class="total-row">Итого: <span id="tc">0 ₽</span></div>
+    </div>
+
+    <!-- Датчик: расчёт по цене -->
+    <div class="panel">
+      <div class="panel-title">Датчик: расчёт по цене</div>
+      <div class="row">
+        <span class="label">Количество (шт):</span>
+        <input type="number" id="sq" placeholder="0">
+      </div>
+      <div class="row">
+        <span class="label">Цена за шт (₽):</span>
+        <input type="number" id="sp" placeholder="0">
+      </div>
+      <div class="total-row">Итого: <span id="ts">0 ₽</span></div>
     </div>
 
     <!-- Налоги и лицензия + доп расходы -->
@@ -357,7 +326,7 @@
       <div>Общая сумма (база): <span id="baseTotal" class="amount">0 ₽</span></div>
       <div>Итого с налогами и надбавками: <span id="finalTotal" class="amount">0 ₽</span></div>
       <div id="vatInfo" style="font-size:13px; color:var(--text-muted); margin-top:5px;"></div>
-      
+
       <button type="button" class="copy-btn" onclick="copyEstimate()">Копировать смету для КП</button>
       <div id="clipboardMsg" style="color:var(--gold); font-weight:bold; display:none; margin-top:5px;">Скопировано!</div>
     </div>
@@ -388,13 +357,10 @@
 
     function updateSensorDisplay() {
       const sum = sensorValues.reduce((acc, v) => acc + v, 0);
-      // Отображаем с запасом только в итоговом поле, но список исходных значений сохраняем
       const sparePercent = parseFloat(document.getElementById('sparePercent').value) || 0;
       const factor = 1 + sparePercent / 100;
       const withSpare = sum * factor;
-      
       sensorTotalCountEl.textContent = Math.ceil(withSpare).toLocaleString('ru-RU');
-      
       if (sensorValues.length === 0) {
         sensorValuesListEl.textContent = '-';
       } else {
@@ -429,9 +395,7 @@
       const sparePercent = parseFloat(document.getElementById('sparePercent').value) || 0;
       const factor = 1 + sparePercent / 100;
       const withSpare = sum * factor;
-
       cableTotalLengthEl.textContent = Math.ceil(withSpare).toLocaleString('ru-RU');
-
       if (cableValues.length === 0) {
         cableValuesListEl.textContent = '-';
       } else {
@@ -453,34 +417,34 @@
       const cl = parseFloat(document.getElementById('cl').value) || 0;
       const cp = parseFloat(document.getElementById('cp').value) || 0;
 
-      // Промежуточные итоги
+      const sq = parseFloat(document.getElementById('sq').value) || 0;
+      const sp = parseFloat(document.getElementById('sp').value) || 0;
+
       const t1 = p1 * q1;
       const t2 = p2 * q2;
       const tc = cl * cp;
+      const ts = sq * sp;
 
-      // Датчики и кабель с запасом
       const sensorSumWithSpare = sensorValues.reduce((acc, v) => acc + v, 0) * spareFactor;
       const cableSumWithSpare = cableValues.reduce((acc, v) => acc + v, 0) * spareFactor;
 
       document.getElementById('t1').textContent = t1.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('t2').textContent = t2.toLocaleString('ru-RU') + ' ₽';
       document.getElementById('tc').textContent = tc.toLocaleString('ru-RU') + ' ₽';
+      document.getElementById('ts').textContent = ts.toLocaleString('ru-RU') + ' ₽';
 
-      // Командировочные
       const travelRate = parseFloat(document.getElementById('travelRate').value) || 0;
       const travelPeople = parseFloat(document.getElementById('travelPeople').value) || 0;
       const travelDays = parseFloat(document.getElementById('travelDays').value) || 0;
       const travelTotal = travelRate * travelPeople * travelDays;
       document.getElementById('travelTotal').textContent = travelTotal.toLocaleString('ru-RU') + ' ₽';
 
-      // Аренда квартиры
       const rentRate = parseFloat(document.getElementById('rentRate').value) || 0;
       const rentDays = parseFloat(document.getElementById('rentDays').value) || 0;
       const rentTotal = rentRate * rentDays;
       document.getElementById('rentTotal').textContent = rentTotal.toLocaleString('ru-RU') + ' ₽';
 
-      // База
-      const baseTotal = t1 + t2 + tc + travelTotal + rentTotal + sensorSumWithSpare + cableSumWithSpare;
+      const baseTotal = t1 + t2 + tc + ts + travelTotal + rentTotal + sensorSumWithSpare + cableSumWithSpare;
 
       const tax6 = document.getElementById('tax6').checked;
       const lic20 = document.getElementById('lic20').checked;
@@ -499,7 +463,6 @@
 
       let finalTotal = subtotal + extra;
 
-      // НДС
       const vatOption = parseFloat(document.getElementById('vatOption').value) || 0;
       const vatAmount = finalTotal * (vatOption / 100);
       const totalWithVat = finalTotal + vatAmount;
@@ -518,7 +481,6 @@
         vatInfo.textContent = 'НДС не учтён';
       }
 
-      // Сохраняем данные для копирования сметы
       window.lastEstimateData = {
         sensorValues: [...sensorValues],
         cableValues: [...cableValues],
@@ -527,7 +489,7 @@
         sparePercent: sparePercent,
         sensorSumWithSpare: sensorSumWithSpare,
         cableSumWithSpare: cableSumWithSpare,
-        t1: t1, t2: t2, tc: tc,
+        t1: t1, t2: t2, tc: tc, ts: ts,
         travelTotal: travelTotal, rentTotal: rentTotal,
         tax: tax, license: license, commission: commission,
         cashoutExtra: extra,
@@ -571,11 +533,14 @@
       if (d.tc > 0) {
         lines.push('5. Кабель (по цене за метр): ' + rub(d.tc));
       }
+      if (d.ts > 0) {
+        lines.push('6. Датчики (по цене за шт): ' + rub(d.ts));
+      }
       if (d.travelTotal > 0) {
-        lines.push('6. Командировочные: ' + rub(d.travelTotal));
+        lines.push('7. Командировочные: ' + rub(d.travelTotal));
       }
       if (d.rentTotal > 0) {
-        lines.push('7. Аренда квартиры: ' + rub(d.rentTotal));
+        lines.push('8. Аренда квартиры: ' + rub(d.rentTotal));
       }
 
       lines.push('─'.repeat(40));
@@ -590,7 +555,6 @@
 
       const text = lines.join('\n');
 
-      // Копирование в буфер обмена с фолбэком
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(() => {
           showCopyMessage();
@@ -628,32 +592,27 @@
     function clearAllFields() {
       if (!confirm('Очистить все поля калькулятора?')) return;
 
-      // Очищаем все input
       document.querySelectorAll('input[type="number"], input[type="text"]').forEach(el => {
         if (el.id === 'sparePercent') {
-          el.value = '10'; // возвращаем значение по умолчанию
+          el.value = '10';
         } else {
           el.value = '';
         }
       });
 
-      // Сбрасываем select
       document.getElementById('commission').value = '0';
       document.getElementById('vatOption').value = '0';
 
-      // Снимаем чекбоксы
       ['tax6', 'lic20', 'cashout'].forEach(id => {
         document.getElementById(id).checked = false;
       });
 
-      // Очищаем накопители
       sensorValues = [];
       cableValues = [];
       updateSensorDisplay();
       updateCableDisplay();
 
-      // Сбрасываем итоги
-      ['t1', 't2', 'tc', 'travelTotal', 'rentTotal', 'total'].forEach(id => {
+      ['t1', 't2', 'tc', 'ts', 'travelTotal', 'rentTotal', 'total'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.textContent = '0 ₽';
       });
